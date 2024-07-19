@@ -3,18 +3,46 @@ name: CI
 
 # 2 워크플로가 시작될 조건 지정
 on:
-  push:
-    branches: [ main ]
+    push:
+        branches:
+            - develop
+            - main
+    pull_request:
+        branches:
+        - "*"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest # 3 실행 환경 지정
-    #4 실행스텝지정
-    steps:
-      - uses: actions/checkout@v3
+    prepare-ci:
+        name: ⚙️ Prepare CI
+        runs-on: macos-14
+        
+        steps:
+            - uses: actions/checkout@v3
+            
+            - name: Select Xcode 15.4
+              run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+            
+    test:
+        name: 🧪 Test
+        runs-on: macos-14
+        needs: prepare-ci
 
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
+        steps:
+          - uses: actions/checkout@v3
+
+          - name: List Xcode installations
+            run: sudo ls -1 /Applications | grep "Xcode"
+
+          - name: Select Xcode 15.4
+            run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+          - name: Show swift version
+            run: swift --version
+
+          - uses: jdx/mise-action@v2
+
+          - name: Install tuist
+            run: |
+              brew install carthage
+              mise install tuist
 
