@@ -45,4 +45,7 @@ jobs:
             run: |
               brew install carthage
               mise install tuist
+              
+          - name: Add Num
+            run: 1 + 1 == 2
 
